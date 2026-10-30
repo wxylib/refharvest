@@ -1,0 +1,43 @@
+[package]
+name = "refharvest"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+description = "Harvest chunk byte references (offset, size, codec) from HDF5 files into mdim-refs tables"
+repository = "https://github.com/wxylib/refharvest"
+keywords = ["hdf5", "netcdf", "zarr", "virtual", "kerchunk"]
+categories = ["science", "encoding"]
+publish = false
+
+[features]
+default = ["parquet", "cli"]
+# Write the flat mdim-refs export (arrays.json, refs_<array>.parquet,
+# sources.parquet). Without it the crate yields rows only.
+parquet = ["dep:arrow-array", "dep:arrow-schema", "dep:parquet"]
+# S3 URLs (s3://bucket/key) through object_store's aws store.
+s3 = ["object_store/aws"]
+cli = ["parquet", "tokio/rt-multi-thread"]
+
+[dependencies]
+async-hdf5 = { version = "=0.1.0", default-features = false, features = ["object_store"] }
+async-trait = "0.1"
+bytes = "1"
+futures = "0.3"
+object_store = { version = "0.13", default-features = false, features = ["http", "fs"] }
+serde_json = "1"
+tokio = { version = "1", features = ["macros", "time"] }
+url = "2"
+arrow-array = { version = "60", default-features = false, optional = true }
+arrow-schema = { version = "60", default-features = false, optional = true }
+parquet = { version = "60", default-features = false, features = ["arrow", "snap"], optional = true }
+
+[dev-dependencies]
+arrow-array = { version = "60", default-features = false }
+# The fixture tables are zstd-compressed Parquet.
+parquet = { version = "60", default-features = false, features = ["arrow", "zstd"] }
+hdf5-pure = { version = "0.47", default-features = false, features = ["std", "deflate"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
+
+[[bin]]
+name = "refharvest"
+required-features = ["cli"]

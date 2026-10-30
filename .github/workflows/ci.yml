@@ -1,0 +1,29 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: wxylib/fixtures
+          # Pinned, so a fixtures change moves the oracles only when this
+          # repository says so (the same pin as wxylib/core).
+          ref: e203c85f322bae598ec257763ae6f060937f3cc7
+          path: fixtures
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo fmt --check
+      - run: cargo clippy --all-targets -- -D warnings
+      - run: cargo test
+        env:
+          WXY_FIXTURES: ${{ github.workspace }}/fixtures
+      - run: cargo build --no-default-features
