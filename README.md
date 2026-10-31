@@ -12,8 +12,8 @@ HDF5 and netCDF-4. Not on crates.io.
 ## What it is
 
 The format parsers are borrowed. HDF5 metadata comes from
-[async-hdf5](https://crates.io/crates/async-hdf5), which reads by byte
-range through `object_store`. refharvest adds what sits around a parser:
+[async-hdf5](https://crates.io/crates/async-hdf5) (from the wxylib
+fork, below), which reads by byte range through `object_store`. refharvest adds what sits around a parser:
 
 - **Rows.** `FileRefs` and `ArrayRefs` per file and array, with their
   `ChunkRef`s; `collate::concat` stacks files along a shared first
@@ -23,7 +23,7 @@ range through `object_store`. refharvest adds what sits around a parser:
   `present = 0`.
 - **A fetch plan.** Version 1 chunk B-trees, libhdf5's default and so
   most netCDF-4 files, are walked a level at a time with many requests in
-  flight. A file written one time step at a time spreads its index nodes
+  flight (in the fork). A file written one time step at a time spreads its index nodes
   through the whole file, so a walk that waits for each node costs a
   round trip per node.
 - **A codec map.** Shuffle, deflate and zstd map to Zarr v2 codec ids and
@@ -68,8 +68,8 @@ Any `async_hdf5::AsyncFileReader` can be harvested with
 | `tests/data/btree_v1.h5`, 1,400 chunks in a two-level B-tree, written by libhdf5 | libhdf5 `H5Dchunk_iter` (rhdf5 `h5getAllChunkInfo`) | identical, at 1, 3 and 32 in flight |
 | a file written by hdf5-pure with a fixed array index | hdf5-pure `Dataset::chunks()` | identical |
 | wxylib/fixtures `mdimrefs/` (3 OISST files, one chunk never written) | GDAL `GetRawBlockInfo` table | identical rows, absent chunk included |
-| 30 OISST v2.1 files over HTTPS (NOAA bucket) | fixtures `mdimrefs/oisst-198109` (GDAL) | all 120 rows identical, 4.9 s |
-| BRAN2023 `ocean_temp_2010_01.nc` and `_02.nc` over HTTPS (NCI THREDDS, 9.9 GB) | fixtures `mdimrefs/bran2023-temp-201001` (VirtualiZarr, libhdf5) | all 97,920 fixture rows identical; 180,540 refs in 69 s, 39.6 MB read |
+| 30 OISST v2.1 files over HTTPS (NOAA bucket) | fixtures `mdimrefs/oisst-198109` (GDAL) | all 120 rows identical, 4.1 s |
+| BRAN2023 `ocean_temp_2010_01.nc` and `_02.nc` over HTTPS (NCI THREDDS, 9.9 GB) | fixtures `mdimrefs/bran2023-temp-201001` (VirtualiZarr, libhdf5) | all 97,920 fixture rows identical; 180,540 refs in 30 s |
 
 The first three run in `cargo test` (the fixtures one needs a
 wxylib/fixtures checkout at `$WXY_FIXTURES` or `../fixtures`).
@@ -80,21 +80,28 @@ table records deflate level 1 where the files' filter pipelines say 4
 `scale_factor` is 0.0078 where the file says 0.007782219909131527
 (design m17).
 
-## Gaps in async-hdf5 0.1.0, filled here
+## async-hdf5 from the wxylib fork
 
-- Version 3 attribute messages fail to parse: the name character set
-  byte is read only when flag bit 0x10 is set, but every version 3
-  message has it. That loses every attribute of a netCDF-4 file written
-  by libhdf5 1.8 or later. refharvest sets the flag on a copy before
-  parsing.
-- Dense attributes (an attribute info message, a fractal heap and a
-  name-index B-tree, used from 8 attributes on) are not read. refharvest
-  reads them with async-hdf5's own heap and B-tree readers.
-- The chunk B-tree walk waits for each node. refharvest walks version 1
-  trees itself.
+HDF5 metadata comes from [wxylib/async-hdf5](https://github.com/wxylib/async-hdf5),
+a fork of async-hdf5 0.1 pinned by commit. It carries three changes, each
+a PR on the fork written to go upstream:
 
-These are meant to go upstream; each workaround is removed when a release
-carries the fix.
+- Version 3 attribute messages parse. 0.1.0 reads the name character set
+  byte only when flag bit 0x10 is set, but every version 3 message has
+  it, so every attribute of a netCDF-4 file written by libhdf5 1.8 or
+  later is lost.
+- Dense attributes are read (an attribute info message, a fractal heap
+  and a name-index B-tree, used from 8 attributes on).
+- Version 1 chunk B-trees are walked a level at a time with
+  `Options::inflight` node reads in flight, each node at its own size.
+  0.1.0 waits for each node and reads an 8 MiB block per miss: 690 s for
+  the BRAN file above, 21 s with the fork.
+
+When an upstream release carries them, refharvest moves back to
+crates.io.
+
+A file with a user block (superblock base address above 0) is refused,
+because async-hdf5 reads addresses as absolute.
 
 ## Not yet
 

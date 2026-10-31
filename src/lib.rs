@@ -44,7 +44,6 @@ use std::fmt;
 
 pub use async_hdf5::AsyncFileReader;
 
-mod btree;
 pub mod codec;
 pub mod collate;
 pub mod hdf5;

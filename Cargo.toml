@@ -19,7 +19,9 @@ s3 = ["object_store/aws"]
 cli = ["parquet", "tokio/rt-multi-thread"]
 
 [dependencies]
-async-hdf5 = { version = "=0.1.0", default-features = false, features = ["object_store"] }
+# The wxylib fork: upstream main plus the attribute fixes and the
+# level-parallel chunk B-tree walk (wxylib/async-hdf5 PRs #1 to #3).
+async-hdf5 = { git = "https://github.com/wxylib/async-hdf5", rev = "30f2b92fb8ec03b729f670f2e3f7dc029cf99068", default-features = false, features = ["object_store"] }
 async-trait = "0.1"
 bytes = "1"
 futures = "0.3"
