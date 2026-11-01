@@ -1,10 +1,10 @@
 //! HDF5 and netCDF-4 sources, through async-hdf5.
 //!
 //! async-hdf5 reads the superblock, object headers, layouts, filters and
-//! attributes. Version 1 chunk B-trees are walked here a level at a time
-//! (see the crate docs); every other index kind (fixed and extensible
-//! arrays, version 2 B-trees, single chunk) and contiguous storage use
-//! async-hdf5's own `chunk_index()`.
+//! attributes, and lists chunks with `chunk_index()`. It comes from the
+//! wxylib/async-hdf5 fork, which reads version 3 attribute messages and
+//! dense attributes and walks version 1 chunk B-trees a level at a time
+//! (`Options::inflight` nodes in flight).
 //!
 //! netCDF-4 conventions read here: dimension names come from each
 //! dataset's `DIMENSION_LIST` (object references to its dimension
@@ -17,15 +17,12 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use std::time::Instant;
 
-use async_hdf5::messages::data_layout::ChunkIndexType;
 use async_hdf5::messages::datatype::ByteOrder;
 use async_hdf5::{AsyncFileReader, AttributeValue, DataType, HDF5Dataset, HDF5File, StorageLayout};
 use serde_json::{json, Map, Value};
 
 use crate::io::Counting;
-use crate::{
-    btree, codec, ArrayRefs, ChunkRef, Cost, Error, FileRefs, Kind, Options, Refusal, Result,
-};
+use crate::{codec, ArrayRefs, ChunkRef, Cost, Error, FileRefs, Kind, Options, Refusal, Result};
 
 /// Attributes that are HDF5 or netCDF bookkeeping, not CF metadata.
 const INTERNAL: &[&str] = &[
@@ -62,6 +59,14 @@ pub async fn harvest_reader(
         .await
         .map_err(|e| Error::Format(format!("{source}: {e}")))?;
     let sb = file.superblock().clone();
+    if sb.base_address != 0 {
+        // async-hdf5 reads addresses as absolute; a user block (base
+        // address above 0) would shift every reference.
+        return Err(Error::Format(format!(
+            "{source}: base address {} (a user block) is not read yet",
+            sb.base_address
+        )));
+    }
     let root = file
         .root_group()
         .await
@@ -79,7 +84,6 @@ pub async fn harvest_reader(
         .await
         .map_err(|e| Error::Format(format!("{source}: {e}")))?;
 
-    let raw: Arc<dyn AsyncFileReader> = Arc::new(counting.clone());
     let mut arrays = Vec::new();
     let mut refused = Vec::new();
     let mut dim_lengths: HashMap<String, u64> = HashMap::new();
@@ -87,8 +91,9 @@ pub async fn harvest_reader(
         let ds = root
             .dataset(&name)
             .await
-            .map_err(|e| Error::Format(format!("{source}: {name}: {e}")))?;
-        let attrs = attributes(&ds, file.reader(), sb.size_of_offsets, sb.size_of_lengths).await;
+            .map_err(|e| Error::Format(format!("{source}: {name}: {e}")))?
+            .with_index_concurrency(opts.inflight);
+        let attrs = ds.attributes().await;
         let class = attrs
             .iter()
             .find(|a| a.name == "CLASS")
@@ -118,11 +123,8 @@ pub async fn harvest_reader(
             &attrs,
             &file,
             &names_by_address,
-            &raw,
             sb.size_of_offsets,
             sb.size_of_lengths,
-            sb.base_address,
-            opts,
         )
         .await
         {
@@ -166,11 +168,8 @@ async fn array(
     attrs: &[async_hdf5::Attribute],
     file: &HDF5File,
     names_by_address: &HashMap<u64, String>,
-    raw: &Arc<dyn AsyncFileReader>,
     size_of_offsets: u8,
     size_of_lengths: u8,
-    base: u64,
-    opts: &Options,
 ) -> std::result::Result<ArrayRefs, String> {
     if ds.has_external_storage() {
         return Err("external storage (bytes in another file)".into());
@@ -185,24 +184,6 @@ async fn array(
         StorageLayout::Compact { .. } => {
             return Err("compact storage (bytes in the object header)".into())
         }
-        StorageLayout::Chunked {
-            chunk_shape,
-            index_address,
-            indexing_type: ChunkIndexType::BTreeV1,
-            ..
-        } if !undefined(*index_address, size_of_offsets) => {
-            let refs = btree::chunks_v1(
-                raw,
-                *index_address,
-                chunk_shape,
-                size_of_offsets,
-                base,
-                opts.inflight,
-            )
-            .await
-            .map_err(|e| e.to_string())?;
-            (chunk_shape.clone(), refs)
-        }
         _ => {
             let index = ds
                 .chunk_index()
@@ -212,7 +193,7 @@ async fn array(
                 Some(c) => c.to_vec(),
                 None => shape.clone(),
             };
-            let refs = index
+            let refs: Vec<ChunkRef> = index
                 .iter()
                 .map(|c| ChunkRef {
                     index: c.indices.clone(),
@@ -276,127 +257,6 @@ async fn array(
         attrs: json_attrs,
         refs,
     })
-}
-
-/// The dataset's attributes, compact and dense, with variable-length
-/// strings resolved.
-///
-/// Two gaps in async-hdf5 0.1.0 are filled here until they are fixed
-/// upstream:
-///
-/// - It reads the name character set byte of a version 3 attribute
-///   message only when flag bit 0x10 is set, but the HDF5 specification
-///   puts that byte in every version 3 message, so each name starts one
-///   byte early and the parse fails (every attribute of a netCDF-4 file
-///   written by libhdf5 1.8 or later). The flag is set on a copy of the
-///   message before parsing.
-/// - It reads compact attributes only. Dense attributes (an attribute
-///   info message pointing at a fractal heap and a name-index version 2
-///   B-tree, which libhdf5 switches to at 8 or more attributes) are read
-///   here with async-hdf5's own heap and B-tree readers.
-async fn attributes(
-    ds: &HDF5Dataset,
-    reader: &Arc<dyn AsyncFileReader>,
-    size_of_offsets: u8,
-    size_of_lengths: u8,
-) -> Vec<async_hdf5::Attribute> {
-    use async_hdf5::messages::attribute::AttributeMessage;
-    use async_hdf5::object_header::msg_types;
-    let mut messages: Vec<bytes::Bytes> = ds
-        .header()
-        .find_messages(msg_types::ATTRIBUTE)
-        .into_iter()
-        .map(|m| m.data.clone())
-        .collect();
-    if let Some(info) = ds.header().find_message(msg_types::ATTRIBUTE_INFO) {
-        messages.extend(
-            dense_attribute_messages(&info.data, reader, size_of_offsets, size_of_lengths).await,
-        );
-    }
-    let mut out = Vec::new();
-    for data in messages {
-        let data = if data.first() == Some(&3) && data.len() > 1 {
-            let mut v = data.to_vec();
-            v[1] |= 0x10;
-            bytes::Bytes::from(v)
-        } else {
-            data
-        };
-        let Ok(am) = AttributeMessage::parse(&data, size_of_offsets, size_of_lengths) else {
-            continue;
-        };
-        match am
-            .to_attribute_resolved(reader, size_of_offsets, size_of_lengths)
-            .await
-        {
-            Ok(a) => out.push(a),
-            Err(_) => out.push(am.to_attribute()),
-        }
-    }
-    out
-}
-
-/// The attribute messages held in dense storage: each record of the
-/// name-index B-tree (type 8) starts with the 8-byte fractal heap id of
-/// one attribute message. Empty when the storage cannot be read.
-async fn dense_attribute_messages(
-    info: &bytes::Bytes,
-    reader: &Arc<dyn AsyncFileReader>,
-    size_of_offsets: u8,
-    size_of_lengths: u8,
-) -> Vec<bytes::Bytes> {
-    use async_hdf5::btree::v2::{collect_all_records, BTreeV2Header};
-    use async_hdf5::heap::fractal::FractalHeap;
-    use async_hdf5::messages::attribute_info::AttributeInfoMessage;
-    let Ok(info) = AttributeInfoMessage::parse(info, size_of_offsets, size_of_lengths) else {
-        return Vec::new();
-    };
-    if undefined(info.fractal_heap_address, size_of_offsets)
-        || undefined(info.name_btree_address, size_of_offsets)
-    {
-        return Vec::new();
-    }
-    let Ok(heap) = FractalHeap::read(
-        reader,
-        info.fractal_heap_address,
-        size_of_offsets,
-        size_of_lengths,
-    )
-    .await
-    else {
-        return Vec::new();
-    };
-    let Ok(header) = BTreeV2Header::read(
-        reader,
-        info.name_btree_address,
-        size_of_offsets,
-        size_of_lengths,
-    )
-    .await
-    else {
-        return Vec::new();
-    };
-    let Ok(records) = collect_all_records(reader, &header, size_of_offsets, size_of_lengths).await
-    else {
-        return Vec::new();
-    };
-    let mut out = Vec::with_capacity(records.len());
-    for r in records {
-        if r.len() < 8 {
-            continue;
-        }
-        if let Ok(m) = heap.get_object(&r[..8]).await {
-            out.push(m);
-        }
-    }
-    out
-}
-
-fn undefined(addr: u64, size_of_offsets: u8) -> bool {
-    match size_of_offsets {
-        8 => addr == u64::MAX,
-        n => addr == (1u64 << (8 * n as u32)) - 1,
-    }
 }
 
 fn default_dims(rank: usize) -> Vec<String> {

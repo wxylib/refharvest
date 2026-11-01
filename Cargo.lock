@@ -123,8 +123,7 @@ dependencies = [
 [[package]]
 name = "async-hdf5"
 version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "393ea5c26c2b5f2ec382e4b909c6d1e77fc7f1860b2ed2250fd8f76eee22b387"
+source = "git+https://github.com/wxylib/async-hdf5?rev=30f2b92fb8ec03b729f670f2e3f7dc029cf99068#30f2b92fb8ec03b729f670f2e3f7dc029cf99068"
 dependencies = [
  "async-trait",
  "byteorder",
