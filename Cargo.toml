@@ -20,8 +20,8 @@ cli = ["parquet", "tokio/rt-multi-thread"]
 
 [dependencies]
 # The wxylib fork: upstream main plus the attribute fixes and the
-# level-parallel chunk B-tree walk (wxylib/async-hdf5 PRs #1 to #3).
-async-hdf5 = { git = "https://github.com/wxylib/async-hdf5", rev = "30f2b92fb8ec03b729f670f2e3f7dc029cf99068", default-features = false, features = ["object_store"] }
+# level-parallel chunk B-tree walk (wxylib/async-hdf5 main after PRs #1 to #4).
+async-hdf5 = { git = "https://github.com/wxylib/async-hdf5", rev = "0c2ad80be5f70bb4384d4a0a106ac5c02f3f2cdf", default-features = false, features = ["object_store"] }
 async-trait = "0.1"
 bytes = "1"
 futures = "0.3"

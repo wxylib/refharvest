@@ -123,7 +123,7 @@ dependencies = [
 [[package]]
 name = "async-hdf5"
 version = "0.1.0"
-source = "git+https://github.com/wxylib/async-hdf5?rev=30f2b92fb8ec03b729f670f2e3f7dc029cf99068#30f2b92fb8ec03b729f670f2e3f7dc029cf99068"
+source = "git+https://github.com/wxylib/async-hdf5?rev=0c2ad80be5f70bb4384d4a0a106ac5c02f3f2cdf#0c2ad80be5f70bb4384d4a0a106ac5c02f3f2cdf"
 dependencies = [
  "async-trait",
  "byteorder",
