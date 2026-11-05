@@ -5,13 +5,15 @@ from async_tiff import TIFF
 from obstore.store import HTTPStore
 
 N = int(sys.argv[1]) if len(sys.argv) > 1 else 10
-items = pq.read_table("ghrsst-mur-v2.parquet", columns=["id", "datetime", "assets", "proj:transform", "proj:shape"])
+base = "https://data.source.coop/ausantarctic/ghrsst-mur-v2"
+store = HTTPStore.from_url(base)
+
+# the collection's STAC GeoParquet index (about 570 KB), read from source.coop
+index = bytes(store.get("ghrsst-mur-v2.parquet").bytes())
+items = pq.read_table(pa.py_buffer(index), columns=["id", "datetime", "assets", "proj:transform", "proj:shape"])
 items = items.sort_by([("datetime", "descending")]).slice(0, N)
 hrefs = [a["analysed_sst"]["href"] for a in items.column("assets").to_pylist()]
 dts = items.column("datetime").to_pylist()
-
-base = "https://data.source.coop/ausantarctic/ghrsst-mur-v2"
-store = HTTPStore.from_url(base)
 
 async def one(href, dt):
     path = href[len(base) + 1:]

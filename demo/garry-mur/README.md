@@ -16,9 +16,9 @@ refharvest issue for the stage this motivates.
 
 1. `harvest.py N`: read the full-resolution IFD of the latest N MUR
    `analysed_sst` COGs and write `mur_refs.parquet`, one row per tile:
-   href, datetime, tx, ty, offset, length. Needs the collection's STAC
-   GeoParquet index, `ghrsst-mur-v2.parquet`, from
-   <https://data.source.coop/ausantarctic/ghrsst-mur-v2/>.
+   href, datetime, tx, ty, offset, length. The latest N dates come from
+   the collection's STAC GeoParquet index, read from
+   <https://data.source.coop/ausantarctic/ghrsst-mur-v2/ghrsst-mur-v2.parquet>.
 2. `plan_join.R`: build a garry plan (10 days, warped to a 2 km EPSG:3031
    grid off East Antarctica, mean over time), walk every warp stage's read
    chunks, transform each to source pixel windows and tile ranges
