@@ -1,6 +1,6 @@
 """Harvest a byte-refs table (one row per tile) for N days of MUR analysed_sst COGs."""
 import asyncio, sys, time
-import pyarrow as pa, pyarrow.parquet as pq, pyarrow.compute as pc
+import pyarrow as pa, pyarrow.parquet as pq, pyarrow.compute as pc, pyarrow.fs as pafs
 from async_tiff import TIFF
 from obstore.store import HTTPStore
 
@@ -8,9 +8,11 @@ N = int(sys.argv[1]) if len(sys.argv) > 1 else 10
 base = "https://data.source.coop/ausantarctic/ghrsst-mur-v2"
 store = HTTPStore.from_url(base)
 
-# the collection's STAC GeoParquet index (about 570 KB), read from source.coop
-index = bytes(store.get("ghrsst-mur-v2.parquet").bytes())
-items = pq.read_table(pa.py_buffer(index), columns=["id", "datetime", "assets", "proj:transform", "proj:shape"])
+# the collection's STAC GeoParquet index, read anonymously from source.coop's
+# S3 bucket (only the columns needed are fetched)
+s3 = pafs.S3FileSystem(anonymous=True, region="us-west-2")
+items = pq.read_table("us-west-2.opendata.source.coop/ausantarctic/ghrsst-mur-v2/ghrsst-mur-v2.parquet",
+                      filesystem=s3, columns=["id", "datetime", "assets", "proj:transform", "proj:shape"])
 items = items.sort_by([("datetime", "descending")]).slice(0, N)
 hrefs = [a["analysed_sst"]["href"] for a in items.column("assets").to_pylist()]
 dts = items.column("datetime").to_pylist()
