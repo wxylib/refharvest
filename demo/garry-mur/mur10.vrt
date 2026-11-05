@@ -1,0 +1,26 @@
+<VRTDataset>
+  <Group name="/">
+    <Dimension name="time" type="TEMPORAL" size="10" indexingVariable="time"/>
+    <Dimension name="lat" type="HORIZONTAL_Y" direction="NORTH" size="17999" indexingVariable="lat"/>
+    <Dimension name="lon" type="HORIZONTAL_X" direction="EAST" size="36000" indexingVariable="lon"/>
+    <Array name="time"><DataType>Float64</DataType><DimensionRef ref="time"/><Unit>days since 1970-01-01</Unit><InlineValues>20750 20751 20752 20753 20754 20755 20756 20757 20758 20759</InlineValues></Array>
+    <Array name="lat"><DataType>Float64</DataType><DimensionRef ref="lat"/><RegularlySpacedValues start="89.995" increment="-0.01"/></Array>
+    <Array name="lon"><DataType>Float64</DataType><DimensionRef ref="lon"/><RegularlySpacedValues start="-179.995" increment="0.01"/></Array>
+    <Array name="analysed_sst">
+      <DataType>Int16</DataType>
+      <DimensionRef ref="time"/><DimensionRef ref="lat"/><DimensionRef ref="lon"/>
+      <SRS dataAxisToSRSAxisMapping="2,1">EPSG:4326</SRS>
+      <NoDataValue>-32768</NoDataValue><Offset>25</Offset><Scale>0.001</Scale>
+      <Source><SourceFilename>/vsicurl/https://data.source.coop/ausantarctic/ghrsst-mur-v2/2026/10/24/20261024090000-JPL-L4_GHRSST-SSTfnd-MUR-GLOB-v02.0-fv04.1_analysed_sst.tif</SourceFilename><SourceBand>1</SourceBand><DestSlab offset="0,0,0"/></Source>
+      <Source><SourceFilename>/vsicurl/https://data.source.coop/ausantarctic/ghrsst-mur-v2/2026/10/25/20261025090000-JPL-L4_GHRSST-SSTfnd-MUR-GLOB-v02.0-fv04.1_analysed_sst.tif</SourceFilename><SourceBand>1</SourceBand><DestSlab offset="1,0,0"/></Source>
+      <Source><SourceFilename>/vsicurl/https://data.source.coop/ausantarctic/ghrsst-mur-v2/2026/10/26/20261026090000-JPL-L4_GHRSST-SSTfnd-MUR-GLOB-v02.0-fv04.1_analysed_sst.tif</SourceFilename><SourceBand>1</SourceBand><DestSlab offset="2,0,0"/></Source>
+      <Source><SourceFilename>/vsicurl/https://data.source.coop/ausantarctic/ghrsst-mur-v2/2026/10/27/20261027090000-JPL-L4_GHRSST-SSTfnd-MUR-GLOB-v02.0-fv04.1_analysed_sst.tif</SourceFilename><SourceBand>1</SourceBand><DestSlab offset="3,0,0"/></Source>
+      <Source><SourceFilename>/vsicurl/https://data.source.coop/ausantarctic/ghrsst-mur-v2/2026/10/28/20261028090000-JPL-L4_GHRSST-SSTfnd-MUR-GLOB-v02.0-fv04.1_analysed_sst.tif</SourceFilename><SourceBand>1</SourceBand><DestSlab offset="4,0,0"/></Source>
+      <Source><SourceFilename>/vsicurl/https://data.source.coop/ausantarctic/ghrsst-mur-v2/2026/10/29/20261029090000-JPL-L4_GHRSST-SSTfnd-MUR-GLOB-v02.0-fv04.1_analysed_sst.tif</SourceFilename><SourceBand>1</SourceBand><DestSlab offset="5,0,0"/></Source>
+      <Source><SourceFilename>/vsicurl/https://data.source.coop/ausantarctic/ghrsst-mur-v2/2026/10/30/20261030090000-JPL-L4_GHRSST-SSTfnd-MUR-GLOB-v02.0-fv04.1_analysed_sst.tif</SourceFilename><SourceBand>1</SourceBand><DestSlab offset="6,0,0"/></Source>
+      <Source><SourceFilename>/vsicurl/https://data.source.coop/ausantarctic/ghrsst-mur-v2/2026/10/31/20261031090000-JPL-L4_GHRSST-SSTfnd-MUR-GLOB-v02.0-fv04.1_analysed_sst.tif</SourceFilename><SourceBand>1</SourceBand><DestSlab offset="7,0,0"/></Source>
+      <Source><SourceFilename>/vsicurl/https://data.source.coop/ausantarctic/ghrsst-mur-v2/2026/11/01/20261101090000-JPL-L4_GHRSST-SSTfnd-MUR-GLOB-v02.0-fv04.1_analysed_sst.tif</SourceFilename><SourceBand>1</SourceBand><DestSlab offset="8,0,0"/></Source>
+      <Source><SourceFilename>/vsicurl/https://data.source.coop/ausantarctic/ghrsst-mur-v2/2026/11/02/20261102090000-JPL-L4_GHRSST-SSTfnd-MUR-GLOB-v02.0-fv04.1_analysed_sst.tif</SourceFilename><SourceBand>1</SourceBand><DestSlab offset="9,0,0"/></Source>
+    </Array>
+  </Group>
+</VRTDataset>

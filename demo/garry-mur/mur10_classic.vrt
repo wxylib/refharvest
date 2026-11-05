@@ -1,0 +1,154 @@
+<VRTDataset rasterXSize="36000" rasterYSize="17999">
+  <SRS dataAxisToSRSAxisMapping="2,1">GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AXIS["Latitude",NORTH],AXIS["Longitude",EAST],AUTHORITY["EPSG","4326"]]</SRS>
+  <GeoTransform> -1.7999500000000000e+02,  1.0000000000000000e-02,  0.0000000000000000e+00,  8.9995000000000005e+01,  0.0000000000000000e+00, -1.0000000000000000e-02</GeoTransform>
+  <VRTRasterBand dataType="Int16" band="1" blockXSize="512" blockYSize="512">
+    <Metadata><MDI key="DIM_time_INDEX">0</MDI><MDI key="DIM_time_VALUE">2026-10-24</MDI></Metadata>
+    <Description>analysed_sst</Description><Offset>25</Offset><Scale>0.001</Scale>
+    <NoDataValue>-32768</NoDataValue>
+    <Offset>25</Offset>
+    <Scale>0.001</Scale>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="0">/vsicurl/https://data.source.coop/ausantarctic/ghrsst-mur-v2/2026/10/24/20261024090000-JPL-L4_GHRSST-SSTfnd-MUR-GLOB-v02.0-fv04.1_analysed_sst.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="36000" RasterYSize="17999" DataType="Int16" BlockXSize="512" BlockYSize="512" />
+      <SrcRect xOff="0" yOff="0" xSize="36000" ySize="17999" />
+      <DstRect xOff="0" yOff="0" xSize="36000" ySize="17999" />
+      <NODATA>-32768</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Int16" band="2" blockXSize="512" blockYSize="512">
+    <Metadata><MDI key="DIM_time_INDEX">1</MDI><MDI key="DIM_time_VALUE">2026-10-25</MDI></Metadata>
+    <Description>analysed_sst</Description><Offset>25</Offset><Scale>0.001</Scale>
+    <NoDataValue>-32768</NoDataValue>
+    <Offset>25</Offset>
+    <Scale>0.001</Scale>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="0">/vsicurl/https://data.source.coop/ausantarctic/ghrsst-mur-v2/2026/10/25/20261025090000-JPL-L4_GHRSST-SSTfnd-MUR-GLOB-v02.0-fv04.1_analysed_sst.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="36000" RasterYSize="17999" DataType="Int16" BlockXSize="512" BlockYSize="512" />
+      <SrcRect xOff="0" yOff="0" xSize="36000" ySize="17999" />
+      <DstRect xOff="0" yOff="0" xSize="36000" ySize="17999" />
+      <NODATA>-32768</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Int16" band="3" blockXSize="512" blockYSize="512">
+    <Metadata><MDI key="DIM_time_INDEX">2</MDI><MDI key="DIM_time_VALUE">2026-10-26</MDI></Metadata>
+    <Description>analysed_sst</Description><Offset>25</Offset><Scale>0.001</Scale>
+    <NoDataValue>-32768</NoDataValue>
+    <Offset>25</Offset>
+    <Scale>0.001</Scale>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="0">/vsicurl/https://data.source.coop/ausantarctic/ghrsst-mur-v2/2026/10/26/20261026090000-JPL-L4_GHRSST-SSTfnd-MUR-GLOB-v02.0-fv04.1_analysed_sst.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="36000" RasterYSize="17999" DataType="Int16" BlockXSize="512" BlockYSize="512" />
+      <SrcRect xOff="0" yOff="0" xSize="36000" ySize="17999" />
+      <DstRect xOff="0" yOff="0" xSize="36000" ySize="17999" />
+      <NODATA>-32768</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Int16" band="4" blockXSize="512" blockYSize="512">
+    <Metadata><MDI key="DIM_time_INDEX">3</MDI><MDI key="DIM_time_VALUE">2026-10-27</MDI></Metadata>
+    <Description>analysed_sst</Description><Offset>25</Offset><Scale>0.001</Scale>
+    <NoDataValue>-32768</NoDataValue>
+    <Offset>25</Offset>
+    <Scale>0.001</Scale>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="0">/vsicurl/https://data.source.coop/ausantarctic/ghrsst-mur-v2/2026/10/27/20261027090000-JPL-L4_GHRSST-SSTfnd-MUR-GLOB-v02.0-fv04.1_analysed_sst.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="36000" RasterYSize="17999" DataType="Int16" BlockXSize="512" BlockYSize="512" />
+      <SrcRect xOff="0" yOff="0" xSize="36000" ySize="17999" />
+      <DstRect xOff="0" yOff="0" xSize="36000" ySize="17999" />
+      <NODATA>-32768</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Int16" band="5" blockXSize="512" blockYSize="512">
+    <Metadata><MDI key="DIM_time_INDEX">4</MDI><MDI key="DIM_time_VALUE">2026-10-28</MDI></Metadata>
+    <Description>analysed_sst</Description><Offset>25</Offset><Scale>0.001</Scale>
+    <NoDataValue>-32768</NoDataValue>
+    <Offset>25</Offset>
+    <Scale>0.001</Scale>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="0">/vsicurl/https://data.source.coop/ausantarctic/ghrsst-mur-v2/2026/10/28/20261028090000-JPL-L4_GHRSST-SSTfnd-MUR-GLOB-v02.0-fv04.1_analysed_sst.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="36000" RasterYSize="17999" DataType="Int16" BlockXSize="512" BlockYSize="512" />
+      <SrcRect xOff="0" yOff="0" xSize="36000" ySize="17999" />
+      <DstRect xOff="0" yOff="0" xSize="36000" ySize="17999" />
+      <NODATA>-32768</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Int16" band="6" blockXSize="512" blockYSize="512">
+    <Metadata><MDI key="DIM_time_INDEX">5</MDI><MDI key="DIM_time_VALUE">2026-10-29</MDI></Metadata>
+    <Description>analysed_sst</Description><Offset>25</Offset><Scale>0.001</Scale>
+    <NoDataValue>-32768</NoDataValue>
+    <Offset>25</Offset>
+    <Scale>0.001</Scale>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="0">/vsicurl/https://data.source.coop/ausantarctic/ghrsst-mur-v2/2026/10/29/20261029090000-JPL-L4_GHRSST-SSTfnd-MUR-GLOB-v02.0-fv04.1_analysed_sst.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="36000" RasterYSize="17999" DataType="Int16" BlockXSize="512" BlockYSize="512" />
+      <SrcRect xOff="0" yOff="0" xSize="36000" ySize="17999" />
+      <DstRect xOff="0" yOff="0" xSize="36000" ySize="17999" />
+      <NODATA>-32768</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Int16" band="7" blockXSize="512" blockYSize="512">
+    <Metadata><MDI key="DIM_time_INDEX">6</MDI><MDI key="DIM_time_VALUE">2026-10-30</MDI></Metadata>
+    <Description>analysed_sst</Description><Offset>25</Offset><Scale>0.001</Scale>
+    <NoDataValue>-32768</NoDataValue>
+    <Offset>25</Offset>
+    <Scale>0.001</Scale>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="0">/vsicurl/https://data.source.coop/ausantarctic/ghrsst-mur-v2/2026/10/30/20261030090000-JPL-L4_GHRSST-SSTfnd-MUR-GLOB-v02.0-fv04.1_analysed_sst.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="36000" RasterYSize="17999" DataType="Int16" BlockXSize="512" BlockYSize="512" />
+      <SrcRect xOff="0" yOff="0" xSize="36000" ySize="17999" />
+      <DstRect xOff="0" yOff="0" xSize="36000" ySize="17999" />
+      <NODATA>-32768</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Int16" band="8" blockXSize="512" blockYSize="512">
+    <Metadata><MDI key="DIM_time_INDEX">7</MDI><MDI key="DIM_time_VALUE">2026-10-31</MDI></Metadata>
+    <Description>analysed_sst</Description><Offset>25</Offset><Scale>0.001</Scale>
+    <NoDataValue>-32768</NoDataValue>
+    <Offset>25</Offset>
+    <Scale>0.001</Scale>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="0">/vsicurl/https://data.source.coop/ausantarctic/ghrsst-mur-v2/2026/10/31/20261031090000-JPL-L4_GHRSST-SSTfnd-MUR-GLOB-v02.0-fv04.1_analysed_sst.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="36000" RasterYSize="17999" DataType="Int16" BlockXSize="512" BlockYSize="512" />
+      <SrcRect xOff="0" yOff="0" xSize="36000" ySize="17999" />
+      <DstRect xOff="0" yOff="0" xSize="36000" ySize="17999" />
+      <NODATA>-32768</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Int16" band="9" blockXSize="512" blockYSize="512">
+    <Metadata><MDI key="DIM_time_INDEX">8</MDI><MDI key="DIM_time_VALUE">2026-11-01</MDI></Metadata>
+    <Description>analysed_sst</Description><Offset>25</Offset><Scale>0.001</Scale>
+    <NoDataValue>-32768</NoDataValue>
+    <Offset>25</Offset>
+    <Scale>0.001</Scale>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="0">/vsicurl/https://data.source.coop/ausantarctic/ghrsst-mur-v2/2026/11/01/20261101090000-JPL-L4_GHRSST-SSTfnd-MUR-GLOB-v02.0-fv04.1_analysed_sst.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="36000" RasterYSize="17999" DataType="Int16" BlockXSize="512" BlockYSize="512" />
+      <SrcRect xOff="0" yOff="0" xSize="36000" ySize="17999" />
+      <DstRect xOff="0" yOff="0" xSize="36000" ySize="17999" />
+      <NODATA>-32768</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Int16" band="10" blockXSize="512" blockYSize="512">
+    <Metadata><MDI key="DIM_time_INDEX">9</MDI><MDI key="DIM_time_VALUE">2026-11-02</MDI></Metadata>
+    <Description>analysed_sst</Description><Offset>25</Offset><Scale>0.001</Scale>
+    <NoDataValue>-32768</NoDataValue>
+    <Offset>25</Offset>
+    <Scale>0.001</Scale>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="0">/vsicurl/https://data.source.coop/ausantarctic/ghrsst-mur-v2/2026/11/02/20261102090000-JPL-L4_GHRSST-SSTfnd-MUR-GLOB-v02.0-fv04.1_analysed_sst.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="36000" RasterYSize="17999" DataType="Int16" BlockXSize="512" BlockYSize="512" />
+      <SrcRect xOff="0" yOff="0" xSize="36000" ySize="17999" />
+      <DstRect xOff="0" yOff="0" xSize="36000" ySize="17999" />
+      <NODATA>-32768</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+</VRTDataset>
