@@ -1,0 +1,7 @@
+mur_refs.parquet
+fetch_summary.json
+garry_direct.rds
+local/
+localtif/
+gdalfetch/
+__pycache__/

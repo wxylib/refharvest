@@ -5,7 +5,16 @@ codec, predictor, geotransform) -- no TIFF header is opened here.
 """
 import asyncio, csv, json, sys, time, os
 import numpy as np, pyarrow.parquet as pq, pyarrow.compute as pc, pyarrow as pa
-import zstandard
+try:                                     # any ZSTD decoder will do
+    import zstandard
+    unzstd = lambda b, n: zstandard.ZstdDecompressor().decompress(b, max_output_size=n)
+except ImportError:
+    try:
+        from compression import zstd     # Python >= 3.14
+        unzstd = lambda b, n: zstd.decompress(b)
+    except ImportError:
+        from numcodecs import Zstd
+        unzstd = lambda b, n: bytes(Zstd().decode(b))
 from obstore.store import HTTPStore
 
 BASE = "https://data.source.coop/ausantarctic/ghrsst-mur-v2"
@@ -27,7 +36,7 @@ def coalesce(off, ln):
     return starts, ends
 
 def decode(buf):
-    raw = zstandard.ZstdDecompressor().decompress(buf, max_output_size=TW * TH * 2)
+    raw = unzstd(buf, TW * TH * 2)
     a = np.frombuffer(raw, "<i2").reshape(TH, TW)
     return np.cumsum(a, axis=1, dtype=np.int16)          # undo predictor 2 (wraps like int16)
 

@@ -1,10 +1,14 @@
-"""Harvest a byte-refs table (one row per tile) for N days of MUR analysed_sst COGs."""
-import asyncio, sys, time
+"""Harvest a byte-refs table (one row per tile) for days of MUR analysed_sst COGs.
+
+    python harvest.py      # the days in items.csv (the demo's 10 days)
+    python harvest.py N    # the latest N days; rewrites items.csv
+"""
+import asyncio, csv, sys, time
 import pyarrow as pa, pyarrow.parquet as pq, pyarrow.compute as pc, pyarrow.fs as pafs
 from async_tiff import TIFF
 from obstore.store import HTTPStore
 
-N = int(sys.argv[1]) if len(sys.argv) > 1 else 10
+N = int(sys.argv[1]) if len(sys.argv) > 1 else None
 base = "https://data.source.coop/ausantarctic/ghrsst-mur-v2"
 store = HTTPStore.from_url(base)
 
@@ -13,9 +17,24 @@ store = HTTPStore.from_url(base)
 s3 = pafs.S3FileSystem(anonymous=True, region="us-west-2")
 items = pq.read_table("us-west-2.opendata.source.coop/ausantarctic/ghrsst-mur-v2/ghrsst-mur-v2.parquet",
                       filesystem=s3, columns=["id", "datetime", "assets", "proj:transform", "proj:shape"])
-items = items.sort_by([("datetime", "descending")]).slice(0, N)
-hrefs = [a["analysed_sst"]["href"] for a in items.column("assets").to_pylist()]
-dts = items.column("datetime").to_pylist()
+items = items.sort_by("datetime")
+allhref = [a["analysed_sst"]["href"] for a in items.column("assets").to_pylist()]
+alldt = items.column("datetime").to_pylist()
+if N is None:
+    want = [r["href"] for r in csv.DictReader(open("items.csv"))]
+    pos = {h: i for i, h in enumerate(allhref)}
+    missing = [h for h in want if h not in pos]
+    if missing:
+        raise SystemExit(f"{len(missing)} items.csv hrefs not in the index, e.g. {missing[0]}")
+    keep = [pos[h] for h in want]
+else:
+    keep = list(range(len(allhref)))[-N:]
+    with open("items.csv", "w", newline="") as f:
+        w = csv.writer(f, quoting=csv.QUOTE_MINIMAL); w.writerow(["href", "datetime"])
+        for i in keep:
+            w.writerow([allhref[i], alldt[i].isoformat()])
+hrefs = [allhref[i] for i in keep]
+dts = [alldt[i] for i in keep]
 
 async def one(href, dt):
     path = href[len(base) + 1:]

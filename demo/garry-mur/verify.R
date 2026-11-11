@@ -14,6 +14,7 @@ for (k in seq_along(summ)) {
   gx <- g$getRasterXSize(); gy <- g$getRasterYSize()
   gv <- g$read(1, 0, 0, gx, gy, gx, gy); g$close()
   m <- matrix(v, nx, ny)[1:gx, 1:gy]               # x fastest; GDAL clips at raster edge
+  gv[is.na(gv)] <- -32768                          # gdalraster reads nodata as NA
   maxdiff <- max(maxdiff, max(abs(as.numeric(m) - gv)))
   f <- file.path("localtif", basename(s$href)); files[k] <- f
   create("GTiff", f, nx, ny, 1, "Int16", options = c("TILED=YES", "COMPRESS=ZSTD"))
