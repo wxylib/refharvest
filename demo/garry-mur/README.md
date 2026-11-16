@@ -69,6 +69,8 @@ Tuned GDAL: `GDAL_DISABLE_READDIR_ON_OPEN=EMPTY_DIR`,
 
 ## Related
 
+- `garry-issue-draft.md`: a suggestion for garry (one read stage across
+  the time axis), drafted and not yet posted.
 - rwarp reproduced the same composite with its own planner (`warp_plan()`,
   10 ms, windows within garry's 2-pixel margin) and kernel; follow-ups are
   on the hypertidy roadmap board
